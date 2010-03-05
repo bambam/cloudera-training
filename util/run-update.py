@@ -12,6 +12,11 @@ usage_string = """
                          about a username mismatch.
     --ignore-repo-check  Continue even if we're not using the official
                          Cloudera training repository.
+    --http               Use the http access method to check for repository
+                         updates (may be slower than the default, but has
+                         better tolerance to firewalls).
+    --workspace-only     Does not update the repository; just deploy a new
+                         workspace.
 
   This script updates your git repository to the most recent
   version of the files.
@@ -42,6 +47,8 @@ TRAINING_USER = "training"
 # This is the URL we expect for the 'origin' ref in the git repo.
 # We don't care what protocol (git://, http://, etc) they use.
 CLOUDERA_ORIGIN_URL = "//github.com/cloudera/cloudera-training.git"
+
+HTTP_REMOTE = "http:" + CLOUDERA_ORIGIN_URL
 
 # Where do we install the Eclipse workspace?
 WORKSPACE_DIR = os.path.expanduser("~/workspace")
@@ -187,10 +194,18 @@ def switch_branch():
   return branch
 
 
-def update_repo(branch):
+def update_repo(branch, use_http):
   """ Get the latest changes """
+  global HTTP_REMOTE
+
   print "Updating repository..."
-  ret = os.system("git pull origin " + branch + ":" + branch)
+  if use_http:
+    print "(Using http)"
+    remote = HTTP_REMOTE
+  else:
+    remote = "origin"
+
+  ret = os.system("git pull " + remote + " " + branch + ":" + branch)
   if ret > 0:
     raise RepoException("Could not download updates. Are you connected to the network?")
 
@@ -362,6 +377,8 @@ def main(argv):
   full_reset = False # If True, git reset --hard and git clean
   force = False # If True, don't check our username, etc.
   force_repo = False # If True, don't check our origin repo
+  use_http = False # If True, use http:// to access the official repo.
+  workspace_only = False # If True, don't checkout, just deploy workspace.
 
   if len(argv) > 1:
     for arg in argv[1:]:
@@ -372,25 +389,30 @@ def main(argv):
         update_workspace = True
       elif arg == "--reset":
         full_reset = True
+      elif arg == "--http":
+        use_http = True
       elif arg == "-f":
         force = True
       elif arg == "--ignore-repo-check":
         force_repo = True
+      elif arg == "--workspace-only":
+        workspace_only = True
       else:
         print "Unknown argument. Try --help"
         return 1
 
-  # Check that we're the "training" user -- or root.
-  check_for_user(force)
+  if not workspace_only:
+    # Check that we're the "training" user -- or root.
+    check_for_user(force)
 
-  # Check that we're in the proper cloudera-training git repo.
-  try:
-    check_for_repo()
-  except RepoException, re:
-    if force_repo:
-      print "Got repo-location error, but continuing with --ignore-repo-check"
-    else:
-      raise re
+    # Check that we're in the proper cloudera-training git repo.
+    try:
+      check_for_repo()
+    except RepoException, re:
+      if force_repo:
+        print "Got repo-location error, but continuing with --ignore-repo-check"
+      else:
+        raise re
 
   # if the user uses --reset, run a git-reset on it.
   if full_reset:
@@ -400,26 +422,28 @@ def main(argv):
     else:
       print "Skipped repository reset."
 
-  # Ensure that we are on the correct branch
-  # based on the branch configuration file.
-  curbranch = switch_branch()
+  if not workspace_only:
+    # Ensure that we are on the correct branch
+    # based on the branch configuration file.
+    curbranch = switch_branch()
 
-  # The actual git-pull update
-  update_repo(curbranch)
+    # The actual git-pull update
+    update_repo(curbranch, use_http)
 
   # If the version file in the workspace has been raised, or
   # the user gives us --workspace, we need to update the workspace too.
-  if update_workspace or workspace_needs_update():
+  if update_workspace or workspace_only or workspace_needs_update():
     refresh_workspace()
 
   # Now that we've finished the update itself, run the post-update hook
   # to set any additional state necessary. So long as they haven't
   # modified the training VM too hard, this will install any additional
   # data files, databases, etc.
-  print "Running post-update hook..."
-  ret = os.system("python util/post-update.py")
-  if ret > 0:
-    raise RepoException("An error occurred running the post-update hook.")
+  if not workspace_only:
+    print "Running post-update hook..."
+    ret = os.system("python util/post-update.py")
+    if ret > 0:
+      raise RepoException("An error occurred running the post-update hook.")
 
   print "Done!"
   return 0

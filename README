@@ -26,3 +26,20 @@ environment, run:
 
   $ git pull
 
+- Many of these exercises use an Eclipse workspace. This will be deployed in
+  the ~/workspace directory. If you would like to update the workspace, run:
+
+  $ ./update-exercises --workspace
+
+  Any existing workspace will be renamed to an alternate directory. You
+  can redeploy the workspace without updating any other repository state
+  by running "./update-exercises --workspace-only"
+
+- Updates to the training repository are conveyed using the git protocol. If
+  you cannot access git (e.g., due to a corporate firewall), you can specify
+  that the script should attempt an http-based download by using:
+
+  $ ./update-exercises --http
+
+  This is a bit slower and more verbose, but usually does the trick.
+
