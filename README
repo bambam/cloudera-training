@@ -43,3 +43,12 @@ environment, run:
 
   This is a bit slower and more verbose, but usually does the trick.
 
+- You can update the binary packages included in this virtual machine
+  (including the installed version of CDH) by running:
+
+  $ sudo apt-get update
+  $ sudo apt-get upgrade hadoop-0.20
+
+  After you do this, you'll need to redeploy the workspace (see the
+  instructions above).
+
