@@ -58,11 +58,19 @@ training@training-vm:~$ hadoop
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">
 training@training-vm:~$ cd git
-training@training-vm:~$ ./update-exercises
+training@training-vm:~/git$ ./update-exercises --workspace
 </pre>
 </div></div>
 
-<p>This will download any updates to the exercises.</p>
+<p>This will download any updates to the exercises. If your company has firewalled
+off git, or there are other problems reported connecting to the remote server,
+you can try an HTTP-based mechanism by running:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+training@training-vm:~/git$ ./update-exercises --workspace --http
+</pre>
+</div></div>
 
 <h2><a name="GettingFamiliar-HDFSAccess"></a>HDFS Access</h2>
 
