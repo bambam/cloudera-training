@@ -237,7 +237,11 @@ The home page is set to point to the status page. Try starting a job and, while 
 
 <h2><a name="GettingFamiliar-StoppingMapReduceJobs"></a>Stopping MapReduce Jobs</h2>
 
-<p>Finally, an important capability is stopping jobs that are already running. This is useful if, for example, you accidentally introduced an infinite loop into your Mapper, etc. An important point to remember is that pressing <tt>^C</tt> to kill the current process (which is displaying the MapReduce job's progress) does <b>not</b> actually stop the job itself. The MapReduce job, once submitted to the Hadoop daemons, runs independently of any initiating process. Loosing the connection to the initiating process does not kill a MapReduce job.</p>
+<p>Finally, an important capability is stopping jobs that are already running. This is useful if,
+for example, you accidentally introduced an infinite loop into your Mapper, etc. An important point
+to remember is that pressing <tt>^C</tt> to kill the current process (which is displaying the
+MapReduce job's progress) does <b>not</b> actually stop the job itself. The MapReduce job, once
+submitted to the Hadoop daemons, runs independently of any initiating process. Losing the connection to the initiating process does not kill a MapReduce job.</p>
 
 <p>Instead, you need to tell the Hadoop JobTracker to stop the job.</p>
 
