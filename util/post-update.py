@@ -145,7 +145,7 @@ def setup_training_db():
   print "Resetting training database state..."
   os.system("mysql training < data/mysql-data")
   os.system("mysql training < data/mysql-data2")
-# extract HBase labs
+  # extract HBase labs
   os.system("tar zxvf data/hbase-labs.tar.gz -C /opt/apache-tomcat*/webapps/")
 
 
