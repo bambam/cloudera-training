@@ -146,7 +146,7 @@ def setup_training_db():
   os.system("mysql training < data/mysql-data")
   os.system("mysql training < data/mysql-data2")
   # extract HBase labs
-  os.system("tar zxvf data/hbase-labs.tar.gz -C /opt/apache-tomcat*/webapps/")
+  os.system("tar zxvf data/hbase-labs.tar.gz -C /opt/apache-tomcat*/webapps/ >/dev/null")
 
 
 def main(argv):
