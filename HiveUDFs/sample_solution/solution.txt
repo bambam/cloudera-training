@@ -1,0 +1,101 @@
+This file describes the process for one possible solution for the Hive UDF exercise.
+
+---------------
+Beginning Setup
+---------------
+
+Create a directory for Hive UDF (this is also the location where jar files will be created). In the e-learning module and for this sample exercise, the directory
+
+/com/example/hive/udf
+
+was used. This is where Hive UDFs are stored.
+
+--------------------------
+Create Sample Data in Hive
+--------------------------
+
+First, create the table in Hive:
+
+hive> CREATE TABLE IF NOT EXISTS subscriber (
+    > username STRING,
+    > dept STRING,
+    > email STRING,
+    > provisioned STRING)
+    > ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+
+Next, load the sample dataset into Hive:
+
+hive> LOAD DATA LOCAL INPATH 'subscribers.txt'
+    > INTO TABLE subscriber;
+
+-------------------------
+Run an initial Hive query
+-------------------------
+
+Run a Hive query on the subscriber table:
+
+hive> select provisioned from subscriber;
+Total MapReduce jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_201301172336_0006, Tracking URL = http://localhost:50030/jobdetails.jsp?jobid=job_201301172336_0006
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -Dmapred.job.tracker=localhost:8021 -kill job_201301172336_0006
+2013-01-18 09:51:42,788 Stage-1 map = 100%,  reduce = 0%
+2013-01-18 09:51:43,796 Stage-1 map = 100%,  reduce = 100%
+Ended Job = job_201301172336_0006
+OK
+ 1326182400
+ 1223460720
+ 1357336810
+ 1356426000
+ 1356609600
+ 859895940
+ -72707040
+Time taken: 3.312 seconds
+
+This gives us the unixtime for when subscribers were created, but this is not very useful without converting it to a human-readable format.
+
+--------------
+Create the UDF
+--------------
+
+Create a UDF that converts unixtime to human-readable date/time format. The 'sample_solution/Unix2Date.java' file shows one way to solve this problem.
+
+---------------------------------------
+Compile the UDF and Create the jar file
+---------------------------------------
+
+Compile the Unix2Date.java file:
+
+javac -classpath $HADOOP_HOME/hadoop-core.jar:/usr/lib/hive/lib/hive-common-0.7.1-cdh3u2.jar:/usr/lib/hive/lib/hive-contrib-0.7.1-cdh3u2.jar:/usr/lib/hive/lib/hive-exec-0.7.1-cdh3u2.jar Unix2Date.java
+
+Next, create the jar file:
+
+jar -cf unix_date.jar /com/example/hive/udf/Unix2Date
+
+----------------------------------------
+Add the jar to Hive and Register the UDF
+----------------------------------------
+
+From the Hive shell, add the jar to Hive:
+
+hive> add jar unix_date.jar;
+Added unix_date.jar to class path
+Added resource: unix_date.jar
+
+Next, register the function
+
+hive> CREATE TEMPORARY FUNCTION unix_date
+    > AS 'com.example.hive.udf.Unix2Date';
+OK
+Time taken: 0.233 seconds
+
+---------------
+Execute the UDF
+---------------
+
+From the Hive shell, run the UDF to get dates for subscribers
+
+hive> SELECT username, unix_date(provisioned);
+
+[show output]
