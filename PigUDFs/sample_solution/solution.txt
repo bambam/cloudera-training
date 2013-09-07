@@ -1,0 +1,65 @@
+This file describes the process for one possible solution for the Pig UDF exercise. The instructions here are based on using the Cloudera QuickStart VM available for download at: https://ccp.cloudera.com/display/SUPPORT/Cloudera+QuickStart+VM. 
+
+-----------
+Assumptions
+-----------
+This exercise was written specifically for a standalone VM, therefore the exercise is invoked in local mode.
+
+If you work on this exercise on your cluster, you may need to modify your environment by a.) specifying the $CLASSPATH or $PIG_CLASSPATH, and b.) making sure the dataset is available to all nodes in the cluster. 
+
+Additionally, this exercise was tested against Python 2.6.6, Pig 0.11, and Jython 2.5.2 (all installed and available on the Cloudera QuickStart VM).
+
+--------------
+Create the UDF
+--------------
+
+Create a UDF that takes employee performance data and orders stackrankings based on department. The 'sample_solution/rankudf.py' file shows one way to solve this problem.
+
+---------------------
+Create the Pig Script
+---------------------
+
+Next, create the Pig script that will call the UDF. The 'sample_solution/myscript.pig' file shows one way to solve this problem.
+
+This method uses a separate Python and Pig script, although you could write a single combined script if you prefer.
+
+---------------------------------------------------
+Option 1: Run the Pig Script (with verbose logging)
+---------------------------------------------------
+
+From the directory where you cloned the Cloudera training Git repository containing the PigUDF exercise, run the following:
+
+pig -x local myscript.pig
+
+For this exercise, and because we are running local, you do not need to set any runtime variables.
+
+The output will produce verbose logging and a successful sorting and stackranking, as in:
+
+(0,JohnS,9.5, Accounting)
+(1,Steve Francis, 9.0, Accounting)
+(2,Roderick Trevers,7.0, Accounting)
+(0,Franklin,7.0, Engineering)
+(1,Sam Shade,6.5, Engineering)
+(0,Sandi,9.0, Exec)
+(1,Terri DeHaviland,8.5, Exec)
+(2,Marci,8.0, Exec)
+(0,Joe DeAngel,4.5, Finance)
+(0,Fay LaMore,9.0, Marketing)
+(1,Colin McCullers,8.0, Marketing)
+(2,Bill,6.0, Marketing)
+
+-----------------------------------------------------------------
+Option 2: Run the Pig Script (and suppress informational logging) 
+-----------------------------------------------------------------
+
+As noted in the e-learning module and what you will observe running Option 1, Pig produces verbose logging by default. If you wish to suppress informational logging, you can do so in one of the following two ways.
+
+First, you can change global logging for Pig. If you want to do this, edit /etc/pig/conf/log4j.properties to change the log level to ERROR from INFO and edit etc/pig/conf/pig.properties file to point to the log4j.properties file. These steps are discussed in the Pig UDFs e-learning module.
+
+As a second option, which is useful if you want to simply run a single invocation without verbose logging (or if you don't have access to /etc), you can specify a custom log4j.properties file (included in the exercise archive as "PigUDF_log4j.properties") at the command line, as in:
+
+$ pig -x local -4 PigUDF_log4j.properties myscript.pig
+
+Your output should now just be the successful stackranking without any logging.
+
+Regardless, the log output from this invocation will be stored at the present working directory, in a file called "pig_<datetimestamp>.log"
