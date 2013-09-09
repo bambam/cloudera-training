@@ -1,0 +1,12 @@
+JohnS, 9.5, Accounting
+Bill, 6, Marketing
+Franklin, 7, Engineering
+Marci, 8, Exec
+Joe DeAngel, 4.5, Finance
+Steve Francis, 9, Accounting
+Sam Shade, 6.5, Engineering
+Sandi, 9, Exec
+Roderick Trevers, 7, Accounting
+Terri DeHaviland, 8.5, Exec
+Colin McCullers, 8, Marketing
+Fay LaMore, 9, Marketing
